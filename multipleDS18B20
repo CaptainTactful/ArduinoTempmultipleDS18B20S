@@ -1,4 +1,5 @@
 #include <OneWire.h>
+#include <DallasTemperature.h>
 
 // OneWire DS18S20, DS18B20, DS1822 Temperature Example
 //
@@ -7,13 +8,24 @@
 // The DallasTemperature library can do all this work for you!
 // https://github.com/milesburton/Arduino-Temperature-Control-Library
 
-OneWire  ds(10);  // on pin 10 (a 4.7K resistor is necessary)
+#define ONE_WIRE_BUS 10
+
+OneWire  ds(ONE_WIRE_BUS);  // on pin 10 (a 4.7K resistor is necessary)
+
+DallasTemperature sensors(&ds);
+
+int sensornumber = 0;
+
+//romserials[20] = romserial1, romserial2, romserial3, romserial4, romserial5, romserial6, romserial7, romserial8, romserial9, romserial10, romserial11, romserial12, romserial13, romserial14, romserial15, romserial16, romserial17, romserial18, romserial19, romserial20;
 
 void setup(void) {
   Serial.begin(9600);
+    
 }
 
 void loop(void) {
+
+
   byte i;
   byte present = 0;
   byte type_s;
@@ -21,12 +33,15 @@ void loop(void) {
   byte addr[8];
   int celsius;
   int celsiusstringlength;
+//  int sensornumber = 0;
+  
   String romserial;
   
   if ( !ds.search(addr)) {
     Serial.println("No more addresses.");
     Serial.println();
     ds.reset_search();
+    sensornumber = 0;
     delay(250);
     return;
   }
@@ -107,6 +122,16 @@ void loop(void) {
   celsius = (raw / 16.0)*100;
 romserial = String(addr[i], HEX);
   Serial.print("Temp of ");
+
+if (sensornumber < 20) 
+  {
+    sensornumber++;
+  Serial.print("sensor"); 
+    char sensornumberpadded[5];
+  sprintf(sensornumberpadded, "%02d", sensornumber);
+  Serial.print(sensornumberpadded);
+  Serial.print(" ");
+  }
   Serial.print(addr[0], HEX);
     Serial.print(addr[1], HEX);
       Serial.print(addr[2], HEX);
@@ -121,3 +146,6 @@ romserial = String(addr[i], HEX);
   Serial.print(temppaddedoutput);
   Serial.println();
   delay(2000);
+}
+
+
